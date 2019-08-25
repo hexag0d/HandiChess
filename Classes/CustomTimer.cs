@@ -27,9 +27,9 @@ namespace BottomNavigationViewPager.Classes
         public static double _p2TimeSetting { get; set; }
 
         public static double _timeIntervalDouble;
- 
+
         public static double _addInterval;
-        
+
         public static string _timeDisplayOut;
 
         public static TheFragment1 _fm1 = new TheFragment1();
@@ -51,7 +51,7 @@ namespace BottomNavigationViewPager.Classes
 
             //300 = 3000ms
             _addInterval = 300;
-            
+
             //10ms interval for now, don't know if we need more precision
             _p1Timer.Interval = 10;
             _p2Timer.Interval = 10;
@@ -141,7 +141,7 @@ namespace BottomNavigationViewPager.Classes
             {
                 if (p1Sent)
                 {
-                    await Task.Run(() => 
+                    await Task.Run(() =>
                     {
                         _p1Timer.Stop();
                         _p1Time += _addInterval;
@@ -154,11 +154,11 @@ namespace BottomNavigationViewPager.Classes
                 {
                     await Task.Run(() =>
                     {
-                       _p2Timer.Stop();
-                       _p2Time += _addInterval;
-                       _fm1.SetP2ButtonText(GetTimeStringFromDouble(_p2Time));
-                       GameState._p1HasControl = true;
-                       _p1Timer.Start();
+                        _p2Timer.Stop();
+                        _p2Time += _addInterval;
+                        _fm1.SetP2ButtonText(GetTimeStringFromDouble(_p2Time));
+                        GameState._p1HasControl = true;
+                        _p1Timer.Start();
                     });
                 }
             }
@@ -210,7 +210,7 @@ namespace BottomNavigationViewPager.Classes
         /// </summary>
         /// <param name="timeIn"></param>
         /// <returns>formatted string</returns>
-        public string GetTimeStringFromDouble (double timeIn)
+        public string GetTimeStringFromDouble(double timeIn)
         {
             //_timeDisplayOut = (timeIn / 60 / 100).ToString().Substring(0, 4);
             TimeSpan t = TimeSpan.FromMilliseconds((timeIn * 10));
