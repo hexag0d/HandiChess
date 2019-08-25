@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Android.App;
@@ -17,9 +18,9 @@ namespace BottomNavigationViewPager.Classes
     public class CustomTimer
     {
         public static double[] _timerSettings;
-        public static Timer _p1Timer = new Timer();
-        public static Timer _p2Timer = new Timer();
-        public static bool _p1Sent;       
+        public static System.Timers.Timer _p1Timer = new System.Timers.Timer();
+        public static System.Timers.Timer _p2Timer = new System.Timers.Timer();
+        public static bool _p1Sent;
         public static double _p1Time { get; set; }
         public static double _p2Time { get; set; }
         //public static double _p1TimeSetting { get; set; }
@@ -27,9 +28,9 @@ namespace BottomNavigationViewPager.Classes
 
         public event System.EventHandler _p1TimeSettingChanged;
         public event System.EventHandler _p2TimeSettingChanged;
-        
-        public static double _addInterval = 3000;
-        
+
+        public static double _addInterval = 3;
+
         public double _p1TimeSetting
         {
             get
@@ -77,7 +78,7 @@ namespace BottomNavigationViewPager.Classes
                 _p2Time = _p2TimeSetting;
             }
         }
-        
+
         public double[] TimerSettings(double p1Time, double p2Time, double timeAdd)
         {
             _p1TimeSetting = p1Time;
@@ -86,16 +87,16 @@ namespace BottomNavigationViewPager.Classes
 
             return _timerSettings;
         }
-        
+
         public void StartTimer(bool p1Sent)
         {
             if (!GameState._gameInProgress)
             {
                 GameState._gameInProgress = true;
 
-                _p1Timer.Interval = 1;
-                _p2Timer.Interval = 1;
-                
+                _p1Timer.Interval = 1000;
+                _p2Timer.Interval = 1000;
+
                 _p1Timer.Elapsed += P1TimerElapse;
                 _p2Timer.Elapsed += P2TimerElapse;
             }
@@ -114,16 +115,61 @@ namespace BottomNavigationViewPager.Classes
 
         public static TheFragment1 _fm1 = new TheFragment1();
 
+        /*private CancellationTokenSource _canceller;
+
+private async void goButton_Click(object sender, EventArgs e)
+{
+    goButton.Enabled = false;
+    stopButton.Enabled = true;
+
+    _canceller = new CancellationTokenSource();
+    await Task.Run(() =>
+    {
+        do
+        {
+            Console.WriteLine("Hello, world");
+            if (_canceller.Token.IsCancellationRequested)
+                break;
+
+        } while (true);
+    });
+
+    _canceller.Dispose();
+    goButton.Enabled = true;
+    stopButton.Enabled = false;
+}
+
+private void stopButton_Click(object sender, EventArgs e)
+{
+    _canceller.Cancel();
+}*/
+        public static CancellationTokenSource _canceller = new CancellationTokenSource();
+
+        public void CancelTimers()
+        {
+            _canceller.Cancel();
+        }
+
         private async void P1TimerElapse(object sender, EventArgs eventArgs)
         {
             if (GameState._p1HasControl)
             {
-                await Task.Run(() => _p1Time--);
+                await Task.Run(() =>
+                {
+                    //   do
+                    //    {
+                    _p1Time--;
+                    _fm1.SetP1ButtonText(_p1Time.ToString());
+                    //        if (_canceller.Token.IsCancellationRequested)
+                    //         {
+                    //             break;
+                    //         }
+                    //     }
+                    //     while (true);
+                });
 
-                await Task.Run(() => 
-                _fm1.SetP1ButtonText(_p1Time.ToString()));
-                
-                if (_p1Time == 0)
+
+                if (_p1Time <= 0)
                 {
                     GameState._p1HasWon = false;
                     _fm1.SetP1ButtonText("You lost!");
@@ -137,12 +183,21 @@ namespace BottomNavigationViewPager.Classes
         {
             if (!GameState._p1HasControl)
             {
-                await Task.Run(() => _p2Time--);
-
                 await Task.Run(() =>
-                _fm1.SetP2ButtonText(_p1Time.ToString()));
-                
-                if (_p2Time == 0)
+                {
+                    //do
+                    // {
+                    _p2Time--;
+                    _fm1.SetP2ButtonText(_p2Time.ToString());
+                    //   if (_canceller.Token.IsCancellationRequested)
+                    //   {
+                    //      break;
+                    //    }
+                    // }
+                    // while (true);
+                });
+
+                if (_p2Time <= 0)
                 {
                     GameState._p1HasWon = true;
                     _fm1.SetP2ButtonText("You lost!");
@@ -168,7 +223,7 @@ namespace BottomNavigationViewPager.Classes
                 _p2Time += _addInterval;
                 _fm1.SetP2ButtonText(_p2Time.ToString());
                 GameState._p1HasControl = true;
-                _p2Timer.Start();
+                _p1Timer.Start();
             }
         }
 

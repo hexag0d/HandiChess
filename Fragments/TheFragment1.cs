@@ -82,8 +82,8 @@ namespace BottomNavigationViewPager.Fragments
             _timeAdderText.TextChanged += TimerAdderChanged;
 
             GameState._gameInProgress = false;
-            CustomTimer._p1Time = 5000000;
-            CustomTimer._p2Time = 5000000;
+            CustomTimer._p1Time = 300;
+            CustomTimer._p2Time = 300;
             
             return _view;
         }
