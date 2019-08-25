@@ -28,8 +28,31 @@ namespace BottomNavigationViewPager.Classes
 
         public event System.EventHandler _p1TimeSettingChanged;
         public event System.EventHandler _p2TimeSettingChanged;
+ 
+        public static double _addInterval;
 
-        public static double _addInterval = 3;
+        private string _p1DisplayOut;
+        private string _p2DisplayOut;
+        public static string _timeDisplayOut;
+
+        /// <summary>
+        /// called OnCreate,
+        /// sets the timer settings,
+        /// will eventually be tied into a static settings file,
+        ///  but for now just sets the game length to 5 minutes
+        /// </summary>
+        public void OnAppLoaded()
+        {
+            // 5 minutes * 60 seconds * 1000ms/sec = 300,000 ms / 10ms interval
+            _p1Time = 30000;
+            _p2Time = 30000;
+            _p1TimeSetting = 30000;
+            _p2TimeSetting = 30000;
+            //300 = 3000ms
+            _addInterval = 300;
+
+            GameState._gameIsPaused = false;
+        }
 
         public double _p1TimeSetting
         {
@@ -94,8 +117,9 @@ namespace BottomNavigationViewPager.Classes
             {
                 GameState._gameInProgress = true;
 
-                _p1Timer.Interval = 1000;
-                _p2Timer.Interval = 1000;
+                //10ms interval for now, don't know if we need more precision
+                _p1Timer.Interval = 10;
+                _p2Timer.Interval = 10;
 
                 _p1Timer.Elapsed += P1TimerElapse;
                 _p2Timer.Elapsed += P2TimerElapse;
@@ -115,57 +139,14 @@ namespace BottomNavigationViewPager.Classes
 
         public static TheFragment1 _fm1 = new TheFragment1();
 
-        /*private CancellationTokenSource _canceller;
-
-private async void goButton_Click(object sender, EventArgs e)
-{
-    goButton.Enabled = false;
-    stopButton.Enabled = true;
-
-    _canceller = new CancellationTokenSource();
-    await Task.Run(() =>
-    {
-        do
-        {
-            Console.WriteLine("Hello, world");
-            if (_canceller.Token.IsCancellationRequested)
-                break;
-
-        } while (true);
-    });
-
-    _canceller.Dispose();
-    goButton.Enabled = true;
-    stopButton.Enabled = false;
-}
-
-private void stopButton_Click(object sender, EventArgs e)
-{
-    _canceller.Cancel();
-}*/
-        public static CancellationTokenSource _canceller = new CancellationTokenSource();
-
-        public void CancelTimers()
-        {
-            _canceller.Cancel();
-        }
-
         private async void P1TimerElapse(object sender, EventArgs eventArgs)
         {
             if (GameState._p1HasControl)
             {
                 await Task.Run(() =>
                 {
-                    //   do
-                    //    {
                     _p1Time--;
-                    _fm1.SetP1ButtonText(_p1Time.ToString());
-                    //        if (_canceller.Token.IsCancellationRequested)
-                    //         {
-                    //             break;
-                    //         }
-                    //     }
-                    //     while (true);
+                    _fm1.SetP1ButtonText(GetTimeStringFromDouble(_p1Time));
                 });
 
 
@@ -185,16 +166,8 @@ private void stopButton_Click(object sender, EventArgs e)
             {
                 await Task.Run(() =>
                 {
-                    //do
-                    // {
                     _p2Time--;
-                    _fm1.SetP2ButtonText(_p2Time.ToString());
-                    //   if (_canceller.Token.IsCancellationRequested)
-                    //   {
-                    //      break;
-                    //    }
-                    // }
-                    // while (true);
+                    _fm1.SetP2ButtonText(GetTimeStringFromDouble(_p2Time));
                 });
 
                 if (_p2Time <= 0)
@@ -209,21 +182,36 @@ private void stopButton_Click(object sender, EventArgs e)
 
         public void TimerButtonOnClick(bool p1Sent)
         {
-            if (p1Sent)
+            if (!GameState._gameIsPaused || !GameState._p1HasWon || GameState._p1HasWon)
             {
-                _p1Timer.Stop();
-                _p1Time += _addInterval;
-                _fm1.SetP1ButtonText(_p1Time.ToString());
-                GameState._p1HasControl = false;
-                _p2Timer.Start();
+                if (p1Sent)
+                {
+                    _p1Timer.Stop();
+                    _p1Time += _addInterval;
+                    _fm1.SetP1ButtonText(GetTimeStringFromDouble(_p1Time));
+                    GameState._p1HasControl = false;
+                    _p2Timer.Start();
+                }
+                else
+                {
+                    _p2Timer.Stop();
+                    _p2Time += _addInterval;
+                    _fm1.SetP2ButtonText(GetTimeStringFromDouble(_p2Time));
+                    GameState._p1HasControl = true;
+                    _p1Timer.Start();
+                }
             }
             else
             {
-                _p2Timer.Stop();
-                _p2Time += _addInterval;
-                _fm1.SetP2ButtonText(_p2Time.ToString());
-                GameState._p1HasControl = true;
-                _p1Timer.Start();
+                if (GameState._p1HasControl)
+                {
+                    _p1Timer.Start();
+                }
+                else
+                {
+                    _p2Timer.Start();
+                }
+                GameState._gameIsPaused = false;
             }
         }
 
@@ -233,8 +221,23 @@ private void stopButton_Click(object sender, EventArgs e)
             _p2Timer.Stop();
             _p1Time = _p1TimeSetting;
             _p2Time = _p2TimeSetting;
-            _fm1.SetP1ButtonText(_p1Time.ToString());
-            _fm1.SetP2ButtonText(_p2Time.ToString());
+            _fm1.SetP1ButtonText(GetTimeStringFromDouble(_p1Time));
+            _fm1.SetP2ButtonText(GetTimeStringFromDouble(_p2Time));
+
+            GameState._gameInProgress = false;
+        }
+
+        public void PauseGame()
+        {
+            GameState._gameIsPaused = true;
+            _p1Timer.Stop();
+            _p2Timer.Stop();
+        }
+
+        public string GetTimeStringFromDouble (double timeIn)
+        {
+            _timeDisplayOut = (timeIn / 60 / 100).ToString().Substring(0, 4);
+            return _timeDisplayOut;
         }
     }
 }

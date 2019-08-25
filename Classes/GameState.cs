@@ -19,6 +19,8 @@ namespace BottomNavigationViewPager.Classes
 
         public static bool _p1HasWon = false;
 
+        public static bool _gameIsPaused { get; set; }
+
         public void ResetGame()
         {
             _gameInProgress = false;

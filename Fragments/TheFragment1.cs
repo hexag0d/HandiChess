@@ -82,9 +82,9 @@ namespace BottomNavigationViewPager.Fragments
             _timeAdderText.TextChanged += TimerAdderChanged;
 
             GameState._gameInProgress = false;
-            CustomTimer._p1Time = 300;
-            CustomTimer._p2Time = 300;
-            
+
+            _customTimer.OnAppLoaded();
+
             return _view;
         }
 
@@ -176,6 +176,11 @@ namespace BottomNavigationViewPager.Fragments
         {
             _customTimer.ResetTimers();
             _gameState.ResetGame();
+        }
+
+        private void PauseButtonOnClick(object sender, EventArgs e)
+        {
+            _customTimer.PauseGame();
         }
         
         /// <summary>
