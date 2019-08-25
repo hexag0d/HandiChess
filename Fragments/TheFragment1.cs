@@ -39,8 +39,7 @@ namespace BottomNavigationViewPager.Fragments
         /// this bool is set true when player 1 is sender of 
         /// event object
         /// </summary>
-        public static bool _p1IsSender = false;
-        
+        public static bool _p1IsSender = false;        
 
         public static TheFragment1 NewInstance(string title, string icon) {
             var fragment = new TheFragment1();
