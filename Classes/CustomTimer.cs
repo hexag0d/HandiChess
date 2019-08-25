@@ -29,9 +29,7 @@ namespace BottomNavigationViewPager.Classes
         public static double _timeIntervalDouble;
  
         public static double _addInterval;
-
-        private string _p1DisplayOut;
-        private string _p2DisplayOut;
+        
         public static string _timeDisplayOut;
 
         public static TheFragment1 _fm1 = new TheFragment1();
@@ -40,7 +38,7 @@ namespace BottomNavigationViewPager.Classes
         /// called OnCreate,
         /// sets the timer settings,
         /// will eventually be tied into a static settings file,
-        ///  but for now just sets the game length to 5 minutes
+        ///  but for now just sets the game length based on edittext.text values
         /// </summary>
         public void OnAppLoaded()
         {
@@ -67,6 +65,10 @@ namespace BottomNavigationViewPager.Classes
             GameState._gameIsPaused = false;
         }
 
+        /// <summary>
+        /// starts the timer
+        /// </summary>
+        /// <param name="p1Sent">p1Sent is a bool set true when player1 sends the command</param>
         public void StartTimer(bool p1Sent)
         {
             if (!GameState._gameInProgress)
@@ -139,13 +141,14 @@ namespace BottomNavigationViewPager.Classes
             {
                 if (p1Sent)
                 {
-                    await Task.Run(() => {
+                    await Task.Run(() => 
+                    {
                         _p1Timer.Stop();
                         _p1Time += _addInterval;
                         _fm1.SetP1ButtonText(GetTimeStringFromDouble(_p1Time));
                         GameState._p1HasControl = false;
                         _p2Timer.Start();
-                        });
+                    });
                 }
                 else
                 {
@@ -161,7 +164,7 @@ namespace BottomNavigationViewPager.Classes
             }
             else
             {
-                if (!GameState._p1HasControl)
+                if (GameState._p1HasControl)
                 {
                     _p1Timer.Start();
                 }
@@ -175,6 +178,8 @@ namespace BottomNavigationViewPager.Classes
 
         /// <summary>
         /// resets the timers when called
+        /// sets button text from _p1/_p2TimeSetting
+        /// also sets the GameState._gameInProgress to false
         /// </summary>
         public void ResetTimers()
         {
@@ -188,6 +193,10 @@ namespace BottomNavigationViewPager.Classes
             GameState._gameInProgress = false;
         }
 
+        /// <summary>
+        /// stops both the timers and sets 
+        /// _gameIsPaused to true
+        /// </summary>
         public void PauseGame()
         {
             GameState._gameIsPaused = true;
@@ -195,6 +204,12 @@ namespace BottomNavigationViewPager.Classes
             _p2Timer.Stop();
         }
 
+        /// <summary>
+        /// the input here is 10ms intervals
+        /// this gets you a formatted string
+        /// </summary>
+        /// <param name="timeIn"></param>
+        /// <returns>formatted string</returns>
         public string GetTimeStringFromDouble (double timeIn)
         {
             //_timeDisplayOut = (timeIn / 60 / 100).ToString().Substring(0, 4);
