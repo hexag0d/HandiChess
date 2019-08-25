@@ -17,30 +17,71 @@ namespace BottomNavigationViewPager.Classes
     public class CustomTimer
     {
         public static double[] _timerSettings;
-
         public static Timer _p1Timer = new Timer();
-
         public static Timer _p2Timer = new Timer();
-
-        public static bool _p1Sent;
-        
+        public static bool _p1Sent;       
         public static double _p1Time { get; set; }
-
         public static double _p2Time { get; set; }
+        //public static double _p1TimeSetting { get; set; }
+        //public static double _p2TimeSetting { get; set; }
 
-        public static double _p1TimeSetting { get; set; }
-
-        public static double _p2TimeSetting { get; set; }
+        public event System.EventHandler _p1TimeSettingChanged;
+        public event System.EventHandler _p2TimeSettingChanged;
         
-        public static bool _p1HasControl = false;
-
         public static double _addInterval = 3000;
         
+        public double _p1TimeSetting
+        {
+            get
+            {
+                return _p1Time;
+            }
+            set
+            {
+                _p1TimeSetting = value;
+                OnP1TimeSettingChanged();
+            }
+        }
+
+        public double _p2TimeSetting
+        {
+            get
+            {
+                return _p2Time;
+            }
+            set
+            {
+                _p2TimeSetting = value;
+                OnP2TimeSettingChanged();
+            }
+        }
+
+        protected virtual void OnP1TimeSettingChanged()
+        {
+            if (_p1TimeSettingChanged != null)
+                _p1TimeSettingChanged(this, EventArgs.Empty);
+
+            if (!GameState._gameInProgress)
+            {
+                _p1Time = _p1TimeSetting;
+            }
+        }
+
+        protected virtual void OnP2TimeSettingChanged()
+        {
+            if (_p2TimeSettingChanged != null)
+                _p2TimeSettingChanged(this, EventArgs.Empty);
+
+            if (!GameState._gameInProgress)
+            {
+                _p2Time = _p2TimeSetting;
+            }
+        }
         
         public double[] TimerSettings(double p1Time, double p2Time, double timeAdd)
         {
-            _p1Time = _p1Time;
-            _p2Time = _p2Time;
+            _p1TimeSetting = p1Time;
+            _p2TimeSetting = p2Time;
             _addInterval = timeAdd;
 
             return _timerSettings;
@@ -61,13 +102,13 @@ namespace BottomNavigationViewPager.Classes
 
             if (p1Sent)
             {
-                _p2Timer.Stop();
-                _p1Timer.Start();
+                GameState._p1HasControl = false;
+                _p2Timer.Start();
             }
             else
             {
-                _p1Timer.Stop();
-                _p2Timer.Start();
+                GameState._p1HasControl = true;
+                _p1Timer.Start();
             }
         }
 
@@ -75,7 +116,7 @@ namespace BottomNavigationViewPager.Classes
 
         private async void P1TimerElapse(object sender, EventArgs eventArgs)
         {
-            while (_p1HasControl)
+            if (GameState._p1HasControl)
             {
                 await Task.Run(() => _p1Time--);
 
@@ -94,7 +135,7 @@ namespace BottomNavigationViewPager.Classes
 
         private async void P2TimerElapse(object sender, EventArgs eventArgs)
         {
-            while (!_p1HasControl)
+            if (!GameState._p1HasControl)
             {
                 await Task.Run(() => _p2Time--);
 
@@ -118,7 +159,7 @@ namespace BottomNavigationViewPager.Classes
                 _p1Timer.Stop();
                 _p1Time += _addInterval;
                 _fm1.SetP1ButtonText(_p1Time.ToString());
-                _p1HasControl = false;
+                GameState._p1HasControl = false;
                 _p2Timer.Start();
             }
             else
@@ -126,7 +167,7 @@ namespace BottomNavigationViewPager.Classes
                 _p2Timer.Stop();
                 _p2Time += _addInterval;
                 _fm1.SetP2ButtonText(_p2Time.ToString());
-                _p1HasControl = true;
+                GameState._p1HasControl = true;
                 _p2Timer.Start();
             }
         }

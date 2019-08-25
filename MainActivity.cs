@@ -21,6 +21,12 @@ https://github.com/hnabbasi/BottomNavigationViewPager
  
  */
 
+ /*
+  * let the newbs school you in chess from
+  * time to time, so you don't break their ego
+  * 
+  * it's fun to be sporting.
+ */
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.Design.Internal;
@@ -75,14 +81,14 @@ namespace BottomNavigationViewPager
             RemoveShiftMode(_navigationView);
             _navigationView.NavigationItemSelected += NavigationView_NavigationItemSelected;
 
-            _viewPager.OffscreenPageLimit = 4;
+            //_viewPager.OffscreenPageLimit = 4;
             _navigationView.Visibility = ViewStates.Gone;
         }
 
         TheFragment1 _fm1 = TheFragment1.NewInstance("Timer", "tab_home");
         TheFragment2 _fm2 = TheFragment2.NewInstance("Chess960", "tab_subs");
-        TheFragment3 _fm3 = TheFragment3.NewInstance("Feed", "tab_playlist");
-        TheFragment4 _fm4 = TheFragment4.NewInstance("MyChannel", "tab_mychannel");
+        TheFragment3 _fm3 = TheFragment3.NewInstance("RandiChess", "tab_playlist");
+        TheFragment4 _fm4 = TheFragment4.NewInstance("Online", "tab_mychannel");
         TheFragment5 _fm5 = TheFragment5.NewInstance("Settings", "tab_home");
 
         void InitializeTabs()

@@ -22,8 +22,8 @@ namespace BottomNavigationViewPager.Fragments
         protected static View _view;
 
         readonly ExtWebViewClient _wvc = new ExtWebViewClient();
-        
-        public static CustomTimer _timer;
+
+        public static CustomTimer _timer = new CustomTimer();
 
         public static Button _p1TimerButton;
         public static Button _p2TimerButton;
@@ -81,6 +81,10 @@ namespace BottomNavigationViewPager.Fragments
             _p1TimerText.TextChanged += P1TimerChanged;
             _p2TimerText.TextChanged += P2TimerChanged;
             _timeAdderText.TextChanged += TimerAdderChanged;
+
+            GameState._gameInProgress = false;
+            CustomTimer._p1Time = 5000000;
+            CustomTimer._p2Time = 5000000;
             
             return _view;
         }
@@ -95,7 +99,7 @@ namespace BottomNavigationViewPager.Fragments
             }
             else
             {
-                if (CustomTimer._p1HasControl)
+                if (GameState._p1HasControl)
                 {
                     _customTimer.TimerButtonOnClick(_p1IsSender);
                 }
@@ -116,7 +120,7 @@ namespace BottomNavigationViewPager.Fragments
             }
             else
             {
-                if (!CustomTimer._p1HasControl)
+                if (!GameState._p1HasControl)
                 {
                     _customTimer.TimerButtonOnClick(_p1IsSender);
                 }
@@ -180,8 +184,7 @@ namespace BottomNavigationViewPager.Fragments
         /// </summary>
         public void WebViewGoBack()
         {
-            if (_wv.CanGoBack())
-                _wv.GoBack();
+
         }
 
         static bool _wvRl = true;
