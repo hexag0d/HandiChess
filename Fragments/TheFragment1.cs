@@ -7,8 +7,15 @@ using Android.Webkit;
 using Android.Widget;
 using BottomNavigationViewPager.Classes;
 using System;
+using System.Drawing;
 using System.Threading.Tasks;
 using static Android.Views.View;
+
+/*
+ 
+		android:textColor="@android:color/white"
+		android:background="@android:color/black"
+     */
 
 namespace BottomNavigationViewPager.Fragments
 {
@@ -40,9 +47,10 @@ namespace BottomNavigationViewPager.Fragments
         /// this bool is set true when player 1 is sender of 
         /// event object
         /// </summary>
-        public static bool _p1IsSender = false;        
+        public static bool _p1IsSender = false;
 
-        public static TheFragment1 NewInstance(string title, string icon) {
+        public static TheFragment1 NewInstance(string title, string icon)
+        {
             var fragment = new TheFragment1();
             fragment.Arguments = new Bundle();
             fragment.Arguments.PutString("title", title);
@@ -67,7 +75,7 @@ namespace BottomNavigationViewPager.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             _view = inflater.Inflate(Resource.Layout.TheFragmentLayout1, container, false);
-            
+
             _p1TimerButton = _view.FindViewById<Button>(Resource.Id.p1TimerButton);
             _p2TimerButton = _view.FindViewById<Button>(Resource.Id.p2TimerButton);
             _timeAdderText = _view.FindViewById<EditText>(Resource.Id.timeAdderText);
@@ -80,6 +88,9 @@ namespace BottomNavigationViewPager.Fragments
             _p2TimerButton.Click += P2OnClick;
             _resetButton.Click += ResetButtonOnClick;
             _pauseButton.Click += PauseButtonOnClick;
+            //_p1TimerText.FocusChange += P1TimerTextOnFocusChanged;
+            //_p2TimerText.FocusChange += P2TimerTextOnFocusChanged;
+            //_timeAdderText.FocusChange += AdderTextOnFocusChanged;
             _p1TimerText.TextChanged += P1TimerChanged;
             _p2TimerText.TextChanged += P2TimerChanged;
             _timeAdderText.TextChanged += TimerAdderChanged;
@@ -103,7 +114,7 @@ namespace BottomNavigationViewPager.Fragments
             {
                 if (GameState._p1HasControl)
                 {
-                    await Task.Run (() => _customTimer.TimerButtonOnClick(_p1IsSender));
+                    await Task.Run(() => _customTimer.TimerButtonOnClick(_p1IsSender));
                 }
                 else
                 {
@@ -124,8 +135,8 @@ namespace BottomNavigationViewPager.Fragments
             {
                 if (!GameState._p1HasControl)
                 {
-                    await Task.Run (() => 
-                    _customTimer.TimerButtonOnClick(_p1IsSender));
+                    await Task.Run(() =>
+                   _customTimer.TimerButtonOnClick(_p1IsSender));
                 }
                 else
                 {
@@ -133,17 +144,71 @@ namespace BottomNavigationViewPager.Fragments
                 }
             }
         }
+        /*
 
+        public async void SetP1ButtonColor()
+        {
+            if (GameState._p1HasControl)
+            {
+                await Task.Run(() =>
+               _p1TimerButton.SetTextColor(Android.Graphics.Color.Yellow));
+            }
+            else
+            {
+                await Task.Run(() =>
+               _p1TimerButton.SetTextColor(Android.Graphics.Color.White));
+            }
+        }
+
+        public async void SetP2ButtonColor()
+        {
+            if (GameState._p1HasControl)
+            {
+                await Task.Run(() =>
+                _p1TimerButton.SetTextColor(Android.Graphics.Color.Yellow));
+            }
+            else
+            {
+                await Task.Run(() =>
+               _p1TimerButton.SetTextColor(Android.Graphics.Color.White));
+            }
+        }
+        */
+        /*
+        public void P1TimerTextOnFocusChanged(object sender, EventArgs e)
+        {
+            if (_p1TimerText.HasFocus)
+            {
+                _p1TimerText.Text = "";
+            }
+        }
+
+        public void P2TimerTextOnFocusChanged(object sender, EventArgs e)
+        {
+            if (_p2TimerText.HasFocus)
+            {
+                _p2TimerText.Text = "";
+            }
+        }
+
+        public void AdderTextOnFocusChanged(object sender, EventArgs e)
+        {
+            if (_timeAdderText.HasFocus)
+            {
+                _timeAdderText.Text = "";
+            }
+        }
+        */
         public async void SetP1ButtonText(string btnTxt)
         {
-            await Task.Run ( () =>
-            _p1TimerButton.Text = btnTxt);
+            await Task.Run(() =>
+          _p1TimerButton.Text = btnTxt);
         }
 
         public async void SetP2ButtonText(string btnTxt)
         {
-                await Task.Run(() =>
-             _p2TimerButton.Text = btnTxt);
+            await Task.Run(() =>
+         _p2TimerButton.Text = btnTxt);
         }
 
         private void P1TimerChanged(object sender, TextChangedEventArgs eventArgs)
@@ -216,7 +281,14 @@ namespace BottomNavigationViewPager.Fragments
                 //we set the time increment adder
                 //the interval (in seconds) is first converted to a double
                 //then, we multiply by 1000 to get ms, and divide by 10ms intervals
-                CustomTimer._addInterval = ((Convert.ToDouble(_timeAdderText) * 1000) / 10);
+                try
+                {
+                    CustomTimer._addInterval = ((Convert.ToDouble(_timeAdderText) * 1000) / 10);
+                }
+                catch
+                {
+
+                }
             }
         }
 
@@ -230,7 +302,7 @@ namespace BottomNavigationViewPager.Fragments
         {
             _customTimer.PauseGame();
         }
-        
+
         /// <summary>
         /// tells the webview to GoBack, if it can
         /// </summary>
@@ -253,7 +325,7 @@ namespace BottomNavigationViewPager.Fragments
             }
             else
             {
-                
+
             }
         }
 
@@ -277,7 +349,7 @@ namespace BottomNavigationViewPager.Fragments
                 _wvRling = false;
             }
         }
-        
+
 
         private class ExtWebViewClient : WebViewClient
         {
