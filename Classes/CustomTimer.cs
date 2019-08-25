@@ -26,14 +26,15 @@ namespace BottomNavigationViewPager.Classes
         public static double _p1TimeSetting { get; set; }
         public static double _p2TimeSetting { get; set; }
 
-        public event System.EventHandler _p1TimeSettingChanged;
-        public event System.EventHandler _p2TimeSettingChanged;
+        public static double _timeIntervalDouble;
  
         public static double _addInterval;
 
         private string _p1DisplayOut;
         private string _p2DisplayOut;
         public static string _timeDisplayOut;
+
+        public static TheFragment1 _fm1 = new TheFragment1();
 
         /// <summary>
         /// called OnCreate,
@@ -44,22 +45,26 @@ namespace BottomNavigationViewPager.Classes
         public void OnAppLoaded()
         {
             // 5 minutes * 60 seconds * 1000ms/sec = 300,000 ms / 10ms interval
-            _p1Time = 30000;
-            _p2Time = 30000;
+            _p1TimeSetting = _fm1.GetP1TimeIntervalFromText();
+            _p2TimeSetting = _fm1.GetP2TimeIntervalFromText();
+
+            _p1Time = _p1TimeSetting;
+            _p2Time = _p2TimeSetting;
+
             //300 = 3000ms
             _addInterval = 300;
+            
+            //10ms interval for now, don't know if we need more precision
+            _p1Timer.Interval = 10;
+            _p2Timer.Interval = 10;
+
+            _p1Timer.Elapsed += P1TimerElapse;
+            _p2Timer.Elapsed += P2TimerElapse;
+
+            _fm1.SetP1ButtonText(GetTimeStringFromDouble(_p1Time));
+            _fm1.SetP2ButtonText(GetTimeStringFromDouble(_p2Time));
 
             GameState._gameIsPaused = false;
-        }
-
-
-        public double[] TimerSettings(double p1Time, double p2Time, double timeAdd)
-        {
-            _p1TimeSetting = p1Time;
-            _p2TimeSetting = p2Time;
-            _addInterval = timeAdd;
-
-            return _timerSettings;
         }
 
         public void StartTimer(bool p1Sent)
@@ -67,14 +72,13 @@ namespace BottomNavigationViewPager.Classes
             if (!GameState._gameInProgress)
             {
                 GameState._gameInProgress = true;
-
-                //10ms interval for now, don't know if we need more precision
-                _p1Timer.Interval = 10;
-                _p2Timer.Interval = 10;
-
-                _p1Timer.Elapsed += P1TimerElapse;
-                _p2Timer.Elapsed += P2TimerElapse;
             }
+
+            _fm1.SetP1ButtonText(GetTimeStringFromDouble(_fm1.GetP1TimeIntervalFromText()));
+            _fm1.SetP2ButtonText(GetTimeStringFromDouble(_fm1.GetP2TimeIntervalFromText()));
+
+            _p1Time = _p1TimeSetting;
+            _p2Time = _p2TimeSetting;
 
             if (p1Sent)
             {
@@ -87,8 +91,6 @@ namespace BottomNavigationViewPager.Classes
                 _p1Timer.Start();
             }
         }
-
-        public static TheFragment1 _fm1 = new TheFragment1();
 
         private async void P1TimerElapse(object sender, EventArgs eventArgs)
         {
@@ -131,30 +133,35 @@ namespace BottomNavigationViewPager.Classes
             }
         }
 
-        public void TimerButtonOnClick(bool p1Sent)
+        public async void TimerButtonOnClick(bool p1Sent)
         {
             if (!GameState._gameIsPaused || !GameState._p1HasWon || GameState._p1HasWon)
             {
                 if (p1Sent)
                 {
-                    _p1Timer.Stop();
-                    _p1Time += _addInterval;
-                    _fm1.SetP1ButtonText(GetTimeStringFromDouble(_p1Time));
-                    GameState._p1HasControl = false;
-                    _p2Timer.Start();
+                    await Task.Run(() => {
+                        _p1Timer.Stop();
+                        _p1Time += _addInterval;
+                        _fm1.SetP1ButtonText(GetTimeStringFromDouble(_p1Time));
+                        GameState._p1HasControl = false;
+                        _p2Timer.Start();
+                        });
                 }
                 else
                 {
-                    _p2Timer.Stop();
-                    _p2Time += _addInterval;
-                    _fm1.SetP2ButtonText(GetTimeStringFromDouble(_p2Time));
-                    GameState._p1HasControl = true;
-                    _p1Timer.Start();
+                    await Task.Run(() =>
+                    {
+                       _p2Timer.Stop();
+                       _p2Time += _addInterval;
+                       _fm1.SetP2ButtonText(GetTimeStringFromDouble(_p2Time));
+                       GameState._p1HasControl = true;
+                       _p1Timer.Start();
+                    });
                 }
             }
             else
             {
-                if (GameState._p1HasControl)
+                if (!GameState._p1HasControl)
                 {
                     _p1Timer.Start();
                 }
@@ -166,14 +173,17 @@ namespace BottomNavigationViewPager.Classes
             }
         }
 
+        /// <summary>
+        /// resets the timers when called
+        /// </summary>
         public void ResetTimers()
         {
             _p1Timer.Stop();
             _p2Timer.Stop();
             _p1Time = _p1TimeSetting;
             _p2Time = _p2TimeSetting;
-            _fm1.SetP1ButtonText(GetTimeStringFromDouble(_p1Time));
-            _fm1.SetP2ButtonText(GetTimeStringFromDouble(_p2Time));
+            _fm1.SetP1ButtonText(GetTimeStringFromDouble(_p1TimeSetting));
+            _fm1.SetP2ButtonText(GetTimeStringFromDouble(_p2TimeSetting));
 
             GameState._gameInProgress = false;
         }
@@ -187,8 +197,29 @@ namespace BottomNavigationViewPager.Classes
 
         public string GetTimeStringFromDouble (double timeIn)
         {
-            _timeDisplayOut = (timeIn / 60 / 100).ToString().Substring(0, 4);
+            //_timeDisplayOut = (timeIn / 60 / 100).ToString().Substring(0, 4);
+            TimeSpan t = TimeSpan.FromMilliseconds((timeIn * 10));
+            _timeDisplayOut = string.Format("{0:D2}h:{1:D2}m:{2:D2}s:{3:D3}ms",
+                                    t.Hours,
+                                    t.Minutes,
+                                    t.Seconds,
+                                    t.Milliseconds);
             return _timeDisplayOut;
+        }
+
+        /// <summary>
+        /// gets the time interval, input is in minutes
+        /// the game time interval is 10ms.  
+        /// 1ms interval seems overly resource intensive
+        /// I don't think we need that kind of precision.
+        /// </summary>
+        /// <returns>10ms double</returns>
+        public double GetTimeInterval(double timeIn)
+        {
+            // time interval = (minutes * 60 seconds * 1000 ms) / 10ms intervals
+            _timeIntervalDouble = ((timeIn * 60 * 1000) / 10);
+
+            return _timeIntervalDouble;
         }
     }
 }

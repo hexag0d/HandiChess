@@ -7,7 +7,7 @@
 	android:layout_height="match_parent"
 	android:id="@+id/linearLayout1">
 	<Button
-		android:text="5.000"
+		android:text=""
 		xmlns:p1="http://schemas.android.com/apk/res/android"
 		android:layout_width="match_parent"
 		android:layout_height="250.5dp"
@@ -30,6 +30,7 @@
 			android:id="@+id/label1" />
 		<EditText
 			android:text="5"
+			android:inputType="numberDecimal"
 			android:id="@+id/timeSetterP1Text" />
 		<Button
 			p1:text="Reset"
@@ -37,13 +38,14 @@
 			p1:layout_marginRight="0.0dp" />
 		<EditText
 			android:text="3.0"
+			android:inputType="numberDecimal"
 			android:id="@+id/timeAdderText" />
 		<Button
 			android:text="||"
 			android:id="@+id/pauseButton" />
 		<EditText
 			android:text="5"
-			android:inputType="time"
+			android:inputType="numberDecimal"
 			android:id="@+id/timeSetterP2Text"
 			android:layout_marginRight="0.0dp" />
 		<TextView
@@ -55,7 +57,7 @@
 
 	</GridLayout>
 	<Button
-		android:text="5.000"
+		android:text=""
 		android:textSize="60dp"
 		xmlns:p1="http://schemas.android.com/apk/res/android"
 		android:layout_width="match_parent"

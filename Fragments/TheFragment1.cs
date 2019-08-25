@@ -28,6 +28,7 @@ namespace BottomNavigationViewPager.Fragments
         public static Button _p1TimerButton;
         public static Button _p2TimerButton;
         public static Button _resetButton;
+        public static Button _pauseButton;
         public static EditText _p1TimerText;
         public static EditText _p2TimerText;
         public static EditText _timeAdderText;
@@ -73,10 +74,12 @@ namespace BottomNavigationViewPager.Fragments
             _p1TimerText = _view.FindViewById<EditText>(Resource.Id.timeSetterP1Text);
             _p2TimerText = _view.FindViewById<EditText>(Resource.Id.timeSetterP2Text);
             _resetButton = _view.FindViewById<Button>(Resource.Id.resetButton);
+            _pauseButton = _view.FindViewById<Button>(Resource.Id.pauseButton);
 
             _p1TimerButton.Click += P1OnClick;
             _p2TimerButton.Click += P2OnClick;
             _resetButton.Click += ResetButtonOnClick;
+            _pauseButton.Click += PauseButtonOnClick;
             _p1TimerText.TextChanged += P1TimerChanged;
             _p2TimerText.TextChanged += P2TimerChanged;
             _timeAdderText.TextChanged += TimerAdderChanged;
@@ -88,7 +91,7 @@ namespace BottomNavigationViewPager.Fragments
             return _view;
         }
 
-        private void P1OnClick(object sender, EventArgs eventArgs)
+        private async void P1OnClick(object sender, EventArgs eventArgs)
         {
             _p1IsSender = true;
 
@@ -100,7 +103,7 @@ namespace BottomNavigationViewPager.Fragments
             {
                 if (GameState._p1HasControl)
                 {
-                    _customTimer.TimerButtonOnClick(_p1IsSender);
+                    await Task.Run (() => _customTimer.TimerButtonOnClick(_p1IsSender));
                 }
                 else
                 {
@@ -109,7 +112,7 @@ namespace BottomNavigationViewPager.Fragments
             }
         }
 
-        private void P2OnClick(object sender, EventArgs eventArgs)
+        private async void P2OnClick(object sender, EventArgs eventArgs)
         {
             _p1IsSender = false;
 
@@ -121,7 +124,8 @@ namespace BottomNavigationViewPager.Fragments
             {
                 if (!GameState._p1HasControl)
                 {
-                    _customTimer.TimerButtonOnClick(_p1IsSender);
+                    await Task.Run (() => 
+                    _customTimer.TimerButtonOnClick(_p1IsSender));
                 }
                 else
                 {
@@ -144,11 +148,20 @@ namespace BottomNavigationViewPager.Fragments
 
         private void P1TimerChanged(object sender, TextChangedEventArgs eventArgs)
         {
-            if (GameState._gameInProgress == false)
+            try
             {
-                _customTimer.TimerSettings(Convert.ToDouble(_p1TimerText.Text),
-                    Convert.ToDouble(_p2TimerText.Text),
-                    Convert.ToDouble(_timeAdderText));
+                if (GameState._gameInProgress == false)
+                {
+                    CustomTimer._p1TimeSetting = _customTimer.GetTimeInterval(
+                        Convert.ToDouble(_p1TimerText.Text));
+                    CustomTimer._p1Time = CustomTimer._p1TimeSetting;
+                    SetP1ButtonText(
+                        _customTimer.GetTimeStringFromDouble(CustomTimer._p1TimeSetting));
+                }
+            }
+            catch
+            {
+
             }
         }
 
@@ -156,19 +169,54 @@ namespace BottomNavigationViewPager.Fragments
         {
             if (GameState._gameInProgress == false)
             {
-                _customTimer.TimerSettings(Convert.ToDouble(_p1TimerText.Text),
-                    Convert.ToDouble(_p2TimerText.Text),
-                    Convert.ToDouble(_timeAdderText.Text));
+                try
+                {
+                    CustomTimer._p2TimeSetting = _customTimer.GetTimeInterval(
+                        Convert.ToDouble(_p2TimerText.Text));
+                    CustomTimer._p2Time = CustomTimer._p2TimeSetting;
+                    SetP2ButtonText(
+                        _customTimer.GetTimeStringFromDouble(CustomTimer._p2TimeSetting));
+                }
+                catch
+                {
+
+                }
             }
+        }
+
+        /// <summary>
+        /// returns Player1 time interval 
+        /// this is the amount of 10ms intervals
+        /// in user's minute input from text
+        /// </summary>
+        /// <returns>10ms double qty</returns>
+        public double GetP1TimeIntervalFromText()
+        {
+            //the input is in minutes so we will return in 10ms intervals
+            double p1TimeFromText = _customTimer.GetTimeInterval(Convert.ToDouble(_p1TimerText.Text));
+            return p1TimeFromText;
+        }
+
+        /// <summary>
+        /// returns Player2 time interval 
+        /// this is the amount of 10ms intervals
+        /// in user's minute input from text
+        /// </summary>
+        /// <returns>10ms double qty</returns>
+        public double GetP2TimeIntervalFromText()
+        {
+            double p2TimeFromText = _customTimer.GetTimeInterval(Convert.ToDouble(_p2TimerText.Text));
+            return p2TimeFromText;
         }
 
         private void TimerAdderChanged(object sender, TextChangedEventArgs eventArgs)
         {
             if (GameState._gameInProgress == false)
             {
-                _customTimer.TimerSettings(Convert.ToDouble(_p1TimerText.Text),
-                    Convert.ToDouble(_p2TimerText.Text),
-                    Convert.ToDouble(_timeAdderText.Text));
+                //we set the time increment adder
+                //the interval (in seconds) is first converted to a double
+                //then, we multiply by 1000 to get ms, and divide by 10ms intervals
+                CustomTimer._addInterval = ((Convert.ToDouble(_timeAdderText) * 1000) / 10);
             }
         }
 
