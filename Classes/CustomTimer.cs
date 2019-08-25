@@ -23,8 +23,8 @@ namespace BottomNavigationViewPager.Classes
         public static bool _p1Sent;
         public static double _p1Time { get; set; }
         public static double _p2Time { get; set; }
-        //public static double _p1TimeSetting { get; set; }
-        //public static double _p2TimeSetting { get; set; }
+        public static double _p1TimeSetting { get; set; }
+        public static double _p2TimeSetting { get; set; }
 
         public event System.EventHandler _p1TimeSettingChanged;
         public event System.EventHandler _p2TimeSettingChanged;
@@ -46,61 +46,12 @@ namespace BottomNavigationViewPager.Classes
             // 5 minutes * 60 seconds * 1000ms/sec = 300,000 ms / 10ms interval
             _p1Time = 30000;
             _p2Time = 30000;
-            _p1TimeSetting = 30000;
-            _p2TimeSetting = 30000;
             //300 = 3000ms
             _addInterval = 300;
 
             GameState._gameIsPaused = false;
         }
 
-        public double _p1TimeSetting
-        {
-            get
-            {
-                return _p1Time;
-            }
-            set
-            {
-                _p1TimeSetting = value;
-                OnP1TimeSettingChanged();
-            }
-        }
-
-        public double _p2TimeSetting
-        {
-            get
-            {
-                return _p2Time;
-            }
-            set
-            {
-                _p2TimeSetting = value;
-                OnP2TimeSettingChanged();
-            }
-        }
-
-        protected virtual void OnP1TimeSettingChanged()
-        {
-            if (_p1TimeSettingChanged != null)
-                _p1TimeSettingChanged(this, EventArgs.Empty);
-
-            if (!GameState._gameInProgress)
-            {
-                _p1Time = _p1TimeSetting;
-            }
-        }
-
-        protected virtual void OnP2TimeSettingChanged()
-        {
-            if (_p2TimeSettingChanged != null)
-                _p2TimeSettingChanged(this, EventArgs.Empty);
-
-            if (!GameState._gameInProgress)
-            {
-                _p2Time = _p2TimeSetting;
-            }
-        }
 
         public double[] TimerSettings(double p1Time, double p2Time, double timeAdd)
         {
