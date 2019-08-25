@@ -26,6 +26,7 @@ namespace BottomNavigationViewPager.Classes
             _gameInProgress = false;
             _p1HasWon = false;
             _p1HasControl = false;
+            _gameIsPaused = false;
         }
     }
 }
