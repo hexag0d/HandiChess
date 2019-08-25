@@ -2531,9 +2531,6 @@ namespace BottomNavigationViewPager
 			// aapt resource value: 0x7f080020
 			public const int disableHome = 2131230752;
 			
-			// aapt resource value: 0x7f0800ba
-			public const int editText1 = 2131230906;
-			
 			// aapt resource value: 0x7f08007e
 			public const int edit_query = 2131230846;
 			
@@ -2636,29 +2633,29 @@ namespace BottomNavigationViewPager
 			// aapt resource value: 0x7f080061
 			public const int list_item = 2131230817;
 			
-			// aapt resource value: 0x7f0800c2
-			public const int masked = 2131230914;
+			// aapt resource value: 0x7f0800c1
+			public const int masked = 2131230913;
 			
 			// aapt resource value: 0x7f0800a3
 			public const int media_actions = 2131230883;
 			
-			// aapt resource value: 0x7f0800c3
-			public const int menu_home = 2131230915;
-			
-			// aapt resource value: 0x7f0800c6
-			public const int menu_mychannel = 2131230918;
-			
-			// aapt resource value: 0x7f0800c7
-			public const int menu_settings = 2131230919;
+			// aapt resource value: 0x7f0800c2
+			public const int menu_home = 2131230914;
 			
 			// aapt resource value: 0x7f0800c5
-			public const int menu_stream = 2131230917;
+			public const int menu_mychannel = 2131230917;
+			
+			// aapt resource value: 0x7f0800c6
+			public const int menu_settings = 2131230918;
 			
 			// aapt resource value: 0x7f0800c4
-			public const int menu_subs = 2131230916;
+			public const int menu_stream = 2131230916;
 			
-			// aapt resource value: 0x7f0800c0
-			public const int message = 2131230912;
+			// aapt resource value: 0x7f0800c3
+			public const int menu_subs = 2131230915;
+			
+			// aapt resource value: 0x7f0800bf
+			public const int message = 2131230911;
 			
 			// aapt resource value: 0x7f080031
 			public const int middle = 2131230769;
@@ -2693,8 +2690,8 @@ namespace BottomNavigationViewPager
 			// aapt resource value: 0x7f0800b1
 			public const int p1TimerButton = 2131230897;
 			
-			// aapt resource value: 0x7f0800bb
-			public const int p2TimerButton = 2131230907;
+			// aapt resource value: 0x7f0800ba
+			public const int p2TimerButton = 2131230906;
 			
 			// aapt resource value: 0x7f08004c
 			public const int parallax = 2131230796;
@@ -2930,20 +2927,20 @@ namespace BottomNavigationViewPager
 			// aapt resource value: 0x7f08009c
 			public const int viewpager = 2131230876;
 			
-			// aapt resource value: 0x7f0800c1
-			public const int visible = 2131230913;
+			// aapt resource value: 0x7f0800c0
+			public const int visible = 2131230912;
+			
+			// aapt resource value: 0x7f0800bb
+			public const int webView2 = 2131230907;
 			
 			// aapt resource value: 0x7f0800bc
-			public const int webView2 = 2131230908;
+			public const int webView3 = 2131230908;
 			
 			// aapt resource value: 0x7f0800bd
-			public const int webView3 = 2131230909;
+			public const int webView4 = 2131230909;
 			
 			// aapt resource value: 0x7f0800be
-			public const int webView4 = 2131230910;
-			
-			// aapt resource value: 0x7f0800bf
-			public const int webView5 = 2131230911;
+			public const int webView5 = 2131230910;
 			
 			// aapt resource value: 0x7f08003c
 			public const int withText = 2131230780;
